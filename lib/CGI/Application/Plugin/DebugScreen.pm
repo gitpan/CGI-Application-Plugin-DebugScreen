@@ -2,13 +2,16 @@ package CGI::Application::Plugin::DebugScreen;
 
 use strict;
 use warnings;
-use UNIVERSAL::require '0.10';
+use HTML::Template;
 use Devel::StackTrace;
 use IO::File;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
-our $STYLE = qq{
+our $TEMPLATE = qq{
+<html><!-- HTML::Template -->
+   <head>
+       <title>Error in <!-- TMPL_VAR NAME="title" --></title>
        <style type="text/css">
            body {
                font-family: "Bitstream Vera Sans", "Trebuchet MS", Verdana,
@@ -68,14 +71,7 @@ our $STYLE = qq{
                background-color: #E68200;
            }
        </style>
-};
-
-our $TEMPLATE = qq{
-<html><!-- HTML::Template -->
-   <head>
-       <title>Error in <!-- TMPL_VAR NAME="title" --></title>
    </head>
-$STYLE
    <body>
        <div class="box">
            <h1><!-- TMPL_VAR NAME="title" --></h1>
@@ -111,69 +107,24 @@ $STYLE
 </html>
 };
 
-our $TT_TEMPLATE = qq{
-<html><!-- TT -->
-   <head>
-       <title>Error in [% title | html %]</title>
-   </head>
-$STYLE
-   <body>
-       <div class="box">
-           <h1>[% title | html %]</h1>
-
-           <div class="url">[% url | html %]</div>
-           <div class="infos">
-               [% desc | html %]<br />
-           </div>
-           <div class="infos">
-               <h2>StackTrace</h2>
-               <table>
-
-                   <tr>
-                       <th>Package</th>
-                       <th>Line   </th>
-                       <th>File   </th>
-                   </tr>
-                   [% FOR s IN stacktrace -%]
-                       <tr>
-                           <td>[% (s.pkg  || s.package) | html %]</td>
-
-                           <td>[%  s.line               | html %]</td>
-                           <td>[% filename = (s.file || s.filename) %][% filename | html %]</td>
-                       </tr>
-                       <tr>
-                           <td colspan="3">[% code_preview = context(filename, s.line) %][% IF code_preview %]<pre>[% code_preview %]</pre>[% END %]</td>
-                       </tr>
-
-                   [%- END %]
-               </table>
-           </div>
-       </div>
-   </body>
-</html>
-};
-
 sub import {
+    my $self   = shift;
     my $caller = scalar caller;
 
+    no strict 'refs';
     $caller->add_callback( 'init', sub{
         my $self = shift;
-        my $died;
-
+        my $de;
         $SIG{__DIE__} = sub{
-            if ( $died ) {die @_}
-            if ( exists($INC{'CGI/Application/Plugin/TT.pm'}) || exists($INC{'Template.pm'}) ) {
-                $self->debug_report_tt(@_);
-            }
-            else {
-                $self->debug_report(@_);
-            }
-            $died++;
+            push @{$self->{__stacktrace}},[Devel::StackTrace->new(ignore_package=>[qw/CGI::Application::Plugin::DebugScreen Carp CGI::Carp/])->frames];
+            die @_; # rethrow
         };
+        *{"$caller\::report"} = \&debug_report;
     });
-    no strict 'refs';
-    *{"$caller\::debug_report"} = \&debug_report;
-    *{"$caller\::debug_report_tt"} = \&debug_report_tt;
+    $caller->add_callback( 'error', sub{
+        my $self = shift;
+        $self->report(@_);
+    });
 }
 
 sub debug_report{
@@ -182,10 +133,10 @@ sub debug_report{
     my $url = $self->query->url;
     my $title = ref $self || $self;
 
-    my @stacks = Devel::StackTrace->new(ignore_package=>[qw/CGI::Application::Plugin::DebugScreen Carp CGI::Carp/])->frames;
+    my $stacks = $self->{__stacktrace}[0];
 
     my @stacktraces;
-    for my $stack ( @stacks ) {
+    for my $stack ( @{$stacks} ) {
         my %s;
         $s{package}  = exists $stack->{pkg} ? $stack->{pkg}  : $stack->{package};
         $s{filename} = $stack->{file} ? $stack->{file} : $stack->{filename};
@@ -196,8 +147,6 @@ sub debug_report{
         $s{code_preview} = print_context($s{filename},$s{line});
         push @stacktraces, \%s;
     }
-
-    "HTML::Template"->use or die qq[Couldn't load HTML::Template.pm, "$@"];
 
     my $t = HTML::Template->new(
         scalarref => \$TEMPLATE,
@@ -213,26 +162,6 @@ sub debug_report{
     $self->header_props( -type => 'text/html' );
     my $headers = $self->_send_headers();
     print $headers.$t->output;
-}
-
-sub debug_report_tt{
-    my $self = shift;
-    my $desc = shift;
-    my $vars = {
-        url     => $self->query->url,
-        desc    => $desc,
-        title   => ref $self || $self,
-        context => \&print_context,
-    };
-    $vars->{stacktrace} = [Devel::StackTrace->new(ignore_package=>[qw/CGI::Application::Plugin::DebugScreen Carp CGI::Carp/])->frames];
-    "Template"->use or die qq[Couldn't load Template.pm, "$@"];
-    my $t = Template->new;
-    my $output;
-    $t->process(\$TT_TEMPLATE, $vars, \$output);
-
-    $self->header_props( -type => 'text/html' );
-    my $headers = $self->_send_headers();
-    print $headers.$output;
 }
 
 sub print_context {
@@ -276,7 +205,7 @@ CGI::Application::Plugin::DebugScreen - add Debug support to CGI::Application.
 
 =head1 VERSION
 
-This documentation refers to CGI::Application::Plugin::DebugScreen version 0.01
+This documentation refers to CGI::Application::Plugin::DebugScreen version 0.02
 
 =head1 SYNOPSIS
 
@@ -290,6 +219,10 @@ If 500 http's error is generated...
 This plug-in add Debug support to CGI::Application.
 This plug-in like Catalyst debug mode.
 
+When 'die' is generated by 'runmode',
+ this plug-in outputs the stack trace by error_mode().
+The error cannot be caught excluding runmode.
+
 =head1 DEPENDENCIES
 
 L<strict>
@@ -298,7 +231,7 @@ L<warnings>
 
 L<CGI::Application>
 
-L<UNIVERSAL::require>
+L<HTML::Template>
 
 L<Devel::StackTrace>
 
@@ -318,7 +251,7 @@ L<warnings>
 
 L<CGI::Application>
 
-L<UNIVERSAL::require>
+L<HTML::Template>
 
 L<Devel::StackTrace>
 

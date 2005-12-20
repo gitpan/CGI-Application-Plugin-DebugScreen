@@ -19,7 +19,7 @@ This module requires these other modules and libraries:
  - strict
  - warnings
  - CGI::Application
- - UNIVERSAL::require '0.10'
+ - HTML::Template
  - Devel::StackTrace
  - IO::File
 

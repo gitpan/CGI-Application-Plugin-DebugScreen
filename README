@@ -23,6 +23,7 @@ This module requires these other modules and libraries:
  - Devel::StackTrace
  - IO::File
  - CGI::Application::Plugin::ViewCode
+ - UNIVERSAL::require
 
 COPYRIGHT AND LICENCE
 

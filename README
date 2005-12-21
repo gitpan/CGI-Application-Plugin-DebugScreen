@@ -22,6 +22,7 @@ This module requires these other modules and libraries:
  - HTML::Template
  - Devel::StackTrace
  - IO::File
+ - CGI::Application::Plugin::ViewCode
 
 COPYRIGHT AND LICENCE
 

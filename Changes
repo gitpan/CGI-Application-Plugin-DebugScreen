@@ -1,5 +1,9 @@
 Revision history for Perl extension CGI::Application::Plugin::DebugScreen.
 
+0.05  Thu Dec 21 2005
+        - litle correction.
+        - Addition of a few documents.
+
 0.04  Wed Dec 21 16:06 2005
         - add UNIVERSAL::require support.
 

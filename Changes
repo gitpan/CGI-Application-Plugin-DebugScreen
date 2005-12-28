@@ -1,5 +1,13 @@
 Revision history for Perl extension CGI::Application::Plugin::DebugScreen.
 
+0.05_01 Wed Dec 28 2005
+        - jumps to the specified line.
+        - add $ENV{CGI_APP_DEBUG}.
+          When your code is released, this plug-in need not be removed.
+        - The timing of debug mode execution was changed
+          from error callback to error_mode(). 
+          error_mode() is overwrited in error callback.
+
 0.05  Thu Dec 21 2005
         - litle correction.
         - Addition of a few documents.

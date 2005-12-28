@@ -7,7 +7,7 @@ use Devel::StackTrace;
 use IO::File;
 use UNIVERSAL::require;
 
-our $VERSION = '0.05_01';
+our $VERSION = '0.05_02';
 
 our $A_CODE = '<a class="package" href="?rm=view_code&amp;module=';
 our $A_POD  = '<a class="package" href="?rm=view_pod&amp;module=';
@@ -195,7 +195,7 @@ sub debug_report{
         $s{package}  = html_escape($s{package});
         $s{filename} = html_escape($s{filename});
         $s{line}     = html_escape($stack->{line});
-        $s{code_preview} = print_context($s{filename},$s{line});
+        $s{code_preview} = print_context($s{filename},$s{line},$s{package},$self->{__viewcode});
 
         if ( $self->{__viewcode} && $s{package} ne 'main' ) {
             $s{line}     = $A_CODE . $s{package} . '#'.$s{line} . $A_TAIL . $s{line} . $A_END;
@@ -227,7 +227,7 @@ sub debug_report{
 }
 
 sub print_context {
-    my($file, $linenum) = @_;
+    my($file, $linenum, $package, $view) = @_;
     my $code;
     if (-f $file) {
         my $start = $linenum - 3;
@@ -240,10 +240,19 @@ sub print_context {
                 last if $cur_line > $end;
                 next if $cur_line < $start;
                 my @tag = $cur_line == $linenum ? qw(<b> </b>) : ("","");
-                $code .= sprintf(
-                    '%s%5d: %s%s',
-                        $tag[0], $cur_line, html_escape($line), $tag[1],
-                );
+                if ( $view && $package ne 'main' && $cur_line == $linenum ) {
+                    my $t_line = $A_CODE.$package.'#'.$linenum.$A_TAIL;
+                    $code .= sprintf(
+                        '%s%s%5d: %s%s%s',
+                            $tag[0], $t_line, $cur_line, html_escape($line), $A_END, $tag[1],
+                    );
+                }
+                else {
+                    $code .= sprintf(
+                        '%s%5d: %s%s',
+                            $tag[0], $cur_line, html_escape($line), $tag[1],
+                    );
+                }
             }
         }
     }
@@ -267,7 +276,7 @@ CGI::Application::Plugin::DebugScreen - add Debug support to CGI::Application.
 
 =head1 VERSION
 
-This documentation refers to CGI::Application::Plugin::DebugScreen version 0.05_01
+This documentation refers to CGI::Application::Plugin::DebugScreen version 0.05_02
 
 =head1 SYNOPSIS
 
@@ -299,7 +308,7 @@ When CGI::Application::Plugin::ViewCode can be used,
  Title, Package, File, code and line are links to CGI::Application::Plugin::ViewCode's view_code mode.
 line jumps to the specified line.
 And pod are links to CGI::Application::Plugin::ViewCode's view_pod mode.
-As for this, least is scheduled to be corrected...
+The code of the displayed is links to CGI::Application::Plugin::ViewCode's view_code mode.
 
 =head1 DEPENDENCIES
 

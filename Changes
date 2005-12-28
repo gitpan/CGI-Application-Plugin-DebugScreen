@@ -1,5 +1,8 @@
 Revision history for Perl extension CGI::Application::Plugin::DebugScreen.
 
+0.05_02 Wed Dec 28 2005
+        - The code of the displayed is links to CAP::ViewCode.
+
 0.05_01 Wed Dec 28 2005
         - jumps to the specified line.
         - add $ENV{CGI_APP_DEBUG}.

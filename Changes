@@ -1,5 +1,8 @@
 Revision history for Perl extension CGI::Application::Plugin::DebugScreen.
 
+0.05_03 Jan 12 2006
+        - url's info add path_info and query parameter.
+
 0.05_02 Wed Dec 28 2005
         - The code of the displayed is links to CAP::ViewCode.
 

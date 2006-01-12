@@ -7,7 +7,7 @@ use Devel::StackTrace;
 use IO::File;
 use UNIVERSAL::require;
 
-our $VERSION = '0.05_02';
+our $VERSION = '0.05_03';
 
 our $A_CODE = '<a class="package" href="?rm=view_code&amp;module=';
 our $A_POD  = '<a class="package" href="?rm=view_pod&amp;module=';
@@ -64,6 +64,7 @@ our $TEMPLATE = qq{
            }
            div.url {
                font-size: x-small;
+               overflow: auto;
            }
            pre {
                font-size: .8em;
@@ -174,7 +175,8 @@ sub import {
 sub debug_report{
     my $self = shift;
     my $desc = shift;
-    my $url = $self->query->url;
+    my $url = $self->query->url(-path_info=>1,-query=>1);
+
     my $title = ref $self || $self;
 
     $title = html_escape($title);
@@ -276,7 +278,7 @@ CGI::Application::Plugin::DebugScreen - add Debug support to CGI::Application.
 
 =head1 VERSION
 
-This documentation refers to CGI::Application::Plugin::DebugScreen version 0.05_02
+This documentation refers to CGI::Application::Plugin::DebugScreen version 0.05_03
 
 =head1 SYNOPSIS
 
@@ -368,7 +370,7 @@ Atsushi Kobayashi, E<lt>nekokak@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005 by Atsushi Kobayashi (E<lt>nekokak@cpan.orgE<gt>). All rights reserved.
+Copyright (C) 2006 by Atsushi Kobayashi (E<lt>nekokak@cpan.orgE<gt>). All rights reserved.
 
 This library is free software; you can redistribute it and/or modify it
  under the same terms as Perl itself. See L<perlartistic>.

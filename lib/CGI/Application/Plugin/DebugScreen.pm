@@ -7,7 +7,7 @@ use Devel::StackTrace;
 use IO::File;
 use UNIVERSAL::require;
 
-our $VERSION = '0.05_03';
+our $VERSION = '0.06';
 
 our $A_CODE = '<a class="package" href="?rm=view_code&amp;module=';
 our $A_POD  = '<a class="package" href="?rm=view_pod&amp;module=';
@@ -278,7 +278,7 @@ CGI::Application::Plugin::DebugScreen - add Debug support to CGI::Application.
 
 =head1 VERSION
 
-This documentation refers to CGI::Application::Plugin::DebugScreen version 0.05_03
+This documentation refers to CGI::Application::Plugin::DebugScreen version 0.06
 
 =head1 SYNOPSIS
 
@@ -338,21 +338,13 @@ Patches are welcome.
 
 =head1 SEE ALSO
 
-L<strict>
-
-L<warnings>
-
-L<CGI::Application>
-
-L<HTML::Template>
-
-L<Devel::StackTrace>
-
-L<IO::File>
-
 L<CGI::Application::Plugin::ViewCode>
 
-L<UNIVERSAL::require>
+L<Sledge::Plugin::DebugScreen>
+
+L<CGI::Carp::DebugScreen>
+
+L<Catalyst::Plugin::StackTrace>
 
 =head1 Thanks To
 

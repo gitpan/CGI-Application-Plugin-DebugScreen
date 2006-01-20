@@ -1,5 +1,9 @@
 Revision history for Perl extension CGI::Application::Plugin::DebugScreen.
 
+0.06 Jan 20 2006
+        - No code chenge.
+        - Version no chenge and POD was corrected a little. 
+
 0.05_03 Jan 12 2006
         - url's info add path_info and query parameter.
 

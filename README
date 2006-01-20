@@ -25,9 +25,15 @@ This module requires these other modules and libraries:
  - CGI::Application::Plugin::ViewCode
  - UNIVERSAL::require
 
+SEE ALSO
+
+ - Sledge::Plugin::DebugScreen
+ - CGI::Carp::DebugScreen
+ - Catalyst::Plugin::StackTrace
+
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005 by Atsushi Kobayashi (E<lt>nekokak@cpan.orgE<gt>). All rights reserved.
+Copyright (C) 2006 by Atsushi Kobayashi (E<lt>nekokak@cpan.orgE<gt>). All rights reserved.
 
 This library is free software; you can redistribute it and/or modify it
  under the same terms as Perl itself.

@@ -1,5 +1,6 @@
 package CGI::Application::Plugin::DebugScreen;
 
+use 5.006;
 use strict;
 use warnings;
 use HTML::Template;
@@ -7,7 +8,7 @@ use Devel::StackTrace;
 use IO::File;
 use UNIVERSAL::require;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our $A_CODE = '<a class="package" href="?rm=view_code&amp;module=';
 our $A_POD  = '<a class="package" href="?rm=view_pod&amp;module=';
@@ -174,7 +175,8 @@ sub import {
 
 sub debug_report{
     my $self = shift;
-    my $desc = shift;
+    my $desc = '' . shift; #stringify
+                           #useful in case of exception from CGI::Application::Plugin::TT
     my $url = $self->query->url(-path_info=>1,-query=>1);
 
     my $title = ref $self || $self;

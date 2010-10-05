@@ -1,13 +1,18 @@
-use ExtUtils::MakeMaker;
-WriteMakefile(
-    NAME              => 'CGI::Application::Plugin::DebugScreen',
-    VERSION_FROM      => 'lib/CGI/Application/Plugin/DebugScreen.pm',
-    PREREQ_PM         => {
-        HTML::Template    => 0,
-        Devel::StackTrace => 0,
-        IO::File          => 0,
-        CGI::Application  => 0,
-        CGI::Application::Plugin::ViewCode => 0,
-        UNIVERSAL::require => '0.10',
-    },
-);
+use inc::Module::Install;
+name 'CGI-Application-Plugin-DebugScreen';
+all_from 'lib/CGI/Application/Plugin/DebugScreen.pm';
+
+requires 'HTML::Template';
+requires 'Devel::StackTrace';
+requires 'IO::File';
+requires 'CGI::Application' => '4.0';
+requires 'CGI::Application::Plugin::ViewCode';
+requires 'UNIVERSAL::require';
+
+test_requires 'Test::More';
+
+tests 't/*.t';
+
+auto_set_repository;
+WriteAll;
+

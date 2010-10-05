@@ -7,3 +7,4 @@ use lib '../lib';
 use_ok('CGI::Application::Plugin::DebugScreen');
 
 1;
+
